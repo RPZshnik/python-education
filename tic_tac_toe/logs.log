@@ -1,0 +1,11 @@
+2022-04-20 16:44:43,676 - logger - INFO - Oleksii won! Game score: Oleksii - 1, Ilya - 0
+2022-04-20 16:46:04,794 - logger - INFO - This field already occupied
+2022-04-20 16:46:16,522 - logger - INFO - Gleb won! Game score: Gleb - 1, Pavel - 0
+2022-04-20 16:47:12,287 - logger - INFO - Draw!
+2022-04-20 16:50:01,596 - logger - INFO - Print wins log file: 
+2022-04-20 16:52:01,244 - logger - INFO - Draw! Game score: Pavel - 0, Gleb - 0
+2022-04-20 16:52:25,617 - logger - INFO - Pavel won! Game score: Pavel - 1, Gleb - 0
+2022-04-20 16:54:48,739 - logger - INFO - New game. Player(Pavel) vs Player(Pavel)
+2022-04-20 16:54:57,260 - logger - INFO - Pavel won! Game score: Pavel - 1, Gleb - 0
+2022-04-20 16:55:39,175 - logger - INFO - Pavel won! Game score: Pavel - 2, Gleb - 0
+2022-04-20 16:56:29,346 - logger - INFO - Draw! Game score: Pavel - 2, Gleb - 0
