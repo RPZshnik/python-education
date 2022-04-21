@@ -1,0 +1,27 @@
+version: 1
+formatters:
+  console:
+    format: '%(message)s'
+  file:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  wins_file:
+    format: '%(asctime)s -  %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: WARNING
+    formatter: console
+    stream: ext://sys.stdout
+  file:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: file
+    filename: 'logs.log'
+  wins_file:
+    class: logging.FileHandler
+    level: INFO
+    formatter: wins_file
+    filename: 'wins_file.log'
+root:
+  level: INFO
+  handlers: [file, console, wins_file]
