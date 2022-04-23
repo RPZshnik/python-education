@@ -8,6 +8,15 @@ class Board:
         self.__size = size
         self.__fields: List[List[Optional]] = [[None] * size for _ in range(size)]
 
+    def get_possible_moves(self) -> list:
+        """Return possible cords to move"""
+        moves = []
+        for i, row in enumerate(self.__fields):
+            for j, field in enumerate(row):
+                if field is None:
+                    moves.append((i, j))
+        return moves
+
     def clear_board(self):
         """Method that clear the board fields"""
         self.__fields = [[None] * self.__size for _ in range(self.__size)]

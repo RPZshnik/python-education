@@ -7,7 +7,7 @@ from logger import logger
 class Model:
     """Class provides data and methods for working with them"""
     def __init__(self):
-        self.__players = [Player("x"), Player("o")]
+        self.__players = [None, None]
         self.__board = Board()
 
     @staticmethod

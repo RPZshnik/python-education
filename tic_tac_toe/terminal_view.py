@@ -20,9 +20,10 @@ class TerminalView(View):
 
     def display_menu(self):
         print("1. Start game")
-        print("2. Print wins log")
-        print("3. Clear wins log")
-        print("4. Exit")
+        print("2. Start game with bot")
+        print("3. Print wins log")
+        print("4. Clear wins log")
+        print("5. Exit")
 
     def make_input(self, message: str = ""):
         value = input(message)
