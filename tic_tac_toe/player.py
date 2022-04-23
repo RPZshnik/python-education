@@ -9,7 +9,7 @@ class Player:
         self.win_count = 0
 
     def __str__(self):
-        return f"Player({self.__name})"
+        return f"{self.__class__.__name__}({self.__name})"
 
     @property
     def name(self):
