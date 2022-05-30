@@ -89,10 +89,10 @@ def get_name_basics_df(spark: SparkSession, path: str):
     schema = StructType() \
         .add("nconst", StringType(), True) \
         .add("primaryName", StringType(), True) \
-        .add("birthYear", DataType(), True) \
-        .add("deathYear", DateType(), True) \
+        .add("birthYear", IntegerType(), True) \
+        .add("deathYear", IntegerType(), True) \
         .add("primaryProfession", StringType(), True) \
-        .add("knownForTitles", StringType, True)
+        .add("knownForTitles", StringType(), True)
     df = get_df_from_tsv(spark, path, schema)
     df = df.withColumn("primaryProfession", f.split(f.col("primaryProfession"), ","))
     df = df.withColumn("knownForTitles", f.split(f.col("knownForTitles"), ","))

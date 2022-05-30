@@ -23,26 +23,24 @@ def get_films_with_ratings(spark) -> DataFrame:
     return dataframe
 
 
-def get_top_all_the_time(spark) -> DataFrame:
+def get_top_all_the_time(dataframe: DataFrame) -> DataFrame:
     """Function return top films during all th time"""
-    dataframe = get_films_with_ratings(spark)
     dataframe = dataframe.where(f.col("numVotes") >= 10**5)\
-        .where(f.col("titleType") == "movie")\
         .orderBy(dataframe["averageRating"], ascending=False)
     return dataframe
 
 
-def get_top_last_n_years(spark, years: int) -> DataFrame:
+def get_top_last_n_years(dataframe: DataFrame, years: int) -> DataFrame:
     """Function return top films over the past n years"""
     current_year = datetime.datetime.now().year
-    dataframe = get_top_all_the_time(spark)\
+    dataframe = get_top_all_the_time(dataframe)\
         .where(f.col("startYear") >= (current_year - years))
     return dataframe
 
 
-def get_top_between(spark, start_year: int, end_year: int) -> DataFrame:
+def get_top_between(dataframe: DataFrame, start_year: int, end_year: int) -> DataFrame:
     """Function return top films between two years"""
-    dataframe = get_top_all_the_time(spark)
+    dataframe = get_top_all_the_time(dataframe)
     dataframe = dataframe\
         .filter((f.col("startYear") >= start_year) &
                 (f.col("startYear") <= end_year))
@@ -50,16 +48,18 @@ def get_top_between(spark, start_year: int, end_year: int) -> DataFrame:
 
 
 def save_df_to_csv(dataframe: DataFrame, path: str):
-    dataframe.write.option("delimiter", "\t").csv(path)
+    dataframe.write.option("delimiter", "\t").csv(path, header=True)
 
 
 def main():
     """Main function"""
     spark = get_spark_session()
+    dataframe = get_films_with_ratings(spark)
     columns = ["tconst", "primaryTitle", "numVotes", "averageRating", "startYear"]
-    save_df_to_csv(get_top_all_the_time(spark).select(columns), "./output/top_all_time.tsv")
-    save_df_to_csv(get_top_last_n_years(spark, 10).select(columns), "./output/top_last_n_year.tsv")
-    save_df_to_csv(get_top_between(spark, 1960, 1969).select(columns), "./output/top_sixties.tsv")
+    save_df_to_csv(get_top_all_the_time(dataframe).
+                   where(f.col("titleType") == "movie").select(columns), "./output/top_all_time.csv")
+    save_df_to_csv(get_top_last_n_years(dataframe, 10).select(columns), "./output/top_last_n_year.csv")
+    save_df_to_csv(get_top_between(dataframe, 1960, 1969).select(columns), "./output/top_sixties.csv")
 
 
 if __name__ == '__main__':
