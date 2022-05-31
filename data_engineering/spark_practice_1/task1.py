@@ -27,7 +27,7 @@ def get_top_all_the_time(dataframe: DataFrame) -> DataFrame:
     """Function return top films during all th time"""
     dataframe = dataframe.where(f.col("numVotes") >= 10**5)\
         .orderBy(dataframe["averageRating"], ascending=False)
-    return dataframe
+    return dataframe.where(f.col("titleType") == "movie")
 
 
 def get_top_last_n_years(dataframe: DataFrame, years: int) -> DataFrame:
@@ -48,6 +48,7 @@ def get_top_between(dataframe: DataFrame, start_year: int, end_year: int) -> Dat
 
 
 def save_df_to_csv(dataframe: DataFrame, path: str):
+    """Function save dataframe to csv file"""
     dataframe.write.option("delimiter", "\t").csv(path, header=True)
 
 
@@ -56,10 +57,12 @@ def main():
     spark = get_spark_session()
     dataframe = get_films_with_ratings(spark)
     columns = ["tconst", "primaryTitle", "numVotes", "averageRating", "startYear"]
-    save_df_to_csv(get_top_all_the_time(dataframe).
-                   where(f.col("titleType") == "movie").select(columns), "./output/top_all_time.csv")
-    save_df_to_csv(get_top_last_n_years(dataframe, 10).select(columns), "./output/top_last_n_year.csv")
-    save_df_to_csv(get_top_between(dataframe, 1960, 1969).select(columns), "./output/top_sixties.csv")
+    save_df_to_csv(get_top_all_the_time(dataframe).select(columns),
+                   "./output/top_all_time.csv")
+    save_df_to_csv(get_top_last_n_years(dataframe, 10).select(columns),
+                   "./output/top_last_n_year.csv")
+    save_df_to_csv(get_top_between(dataframe, 1960, 1969).select(columns),
+                   "./output/top_sixties.csv")
 
 
 if __name__ == '__main__':
