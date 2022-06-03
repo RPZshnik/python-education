@@ -7,43 +7,42 @@ from pyspark.sql import functions as f
 
 def get_spark_session() -> SparkSession:
     """Function create and return spark session"""
-    spark = SparkSession.builder\
-        .master('local[*]')\
-        .appName('task1')\
-        .getOrCreate()
+    spark = (SparkSession.builder
+             .master('local[*]')
+             .appName('task1')
+             .getOrCreate())
     return spark
 
 
 def get_films_with_ratings(spark) -> DataFrame:
     """Function join films and ratings dataframes and return the result"""
     df1 = dfs.get_title_basics_df(spark, "./data/title.basics.tsv")
-    df2 = dfs.get_title_ratings_df(spark, "./data/title.ratings.tsv")\
-        .withColumnRenamed("tconst", "r_tconst")
+    df2 = (dfs.get_title_ratings_df(spark, "./data/title.ratings.tsv")
+           .withColumnRenamed("tconst", "r_tconst"))
     dataframe = df1.join(df2, df1.tconst == df2.r_tconst)
     return dataframe
 
 
 def get_top_all_the_time(dataframe: DataFrame) -> DataFrame:
     """Function return top films during all th time"""
-    dataframe = dataframe.where(f.col("numVotes") >= 10**5)\
-        .orderBy(dataframe["averageRating"], ascending=False)
+    dataframe = (dataframe.where(f.col("numVotes") >= 100_000)
+                 .orderBy(dataframe["averageRating"], ascending=False))
     return dataframe.where(f.col("titleType") == "movie")
 
 
 def get_top_last_n_years(dataframe: DataFrame, years: int) -> DataFrame:
     """Function return top films over the past n years"""
     current_year = datetime.datetime.now().year
-    dataframe = get_top_all_the_time(dataframe)\
-        .where(f.col("startYear") >= (current_year - years))
+    dataframe = (get_top_all_the_time(dataframe)
+                 .where(f.col("startYear") >= (current_year - years)))
     return dataframe
 
 
 def get_top_between(dataframe: DataFrame, start_year: int, end_year: int) -> DataFrame:
     """Function return top films between two years"""
     dataframe = get_top_all_the_time(dataframe)
-    dataframe = dataframe\
-        .filter((f.col("startYear") >= start_year) &
-                (f.col("startYear") <= end_year))
+    dataframe = dataframe.filter(f.col("startYear") >= start_year &
+                                 f.col("startYear") <= end_year)
     return dataframe
 
 

@@ -9,19 +9,19 @@ from pyspark.sql import functions as f
 def get_spark_session() -> SparkSession:
     """Function create and return spark session"""
     config = SparkConf().setAll([('spark.executor.memory', '16g')])
-    spark = SparkSession.builder\
-        .config(conf=config)\
-        .master('local[*]')\
-        .appName('task1')\
-        .getOrCreate()
+    spark = (SparkSession.builder
+             .config(conf=config)
+             .master('local[*]')
+             .appName('task5')
+             .getOrCreate())
     return spark
 
 
 def get_films_with_ratings(spark) -> DataFrame:
     """Function join films and ratings dataframes and return the result"""
     df1 = dfs.get_title_basics_df(spark, "./data/title.basics.tsv")
-    df2 = dfs.get_title_ratings_df(spark, "./data/title.ratings.tsv")\
-        .withColumnRenamed("tconst", "r_tconst")
+    df2 = (dfs.get_title_ratings_df(spark, "./data/title.ratings.tsv")
+           .withColumnRenamed("tconst", "r_tconst"))
     dataframe = df1.join(df2, df1.tconst == df2.r_tconst)
     return dataframe
 
@@ -35,14 +35,14 @@ def main():
     """Main function"""
     spark = get_spark_session()
 
-    titles = get_films_with_ratings(spark)
-    crew = dfs.get_title_crew_df(spark, "./data/title.crew.tsv")
-    names = dfs.get_name_basics_df(spark, "./data/name.basics.tsv")
-    directors = crew.select("tconst", f.explode("directors").alias("director"))
+    titles_df = get_films_with_ratings(spark)
+    crew_df = dfs.get_title_crew_df(spark, "./data/title.crew.tsv")
+    names_df = dfs.get_name_basics_df(spark, "./data/name.basics.tsv")
+    directors = crew_df.select("tconst", f.explode("directors").alias("director"))
 
-    dataframe = titles.join(directors, titles.tconst == directors.tconst)\
-        .select("director", "primaryTitle", "startYear", "averageRating", "numVotes")
-    dataframe = dataframe.join(names, dataframe.director == names.nconst)
+    dataframe = (titles_df.join(directors, titles_df.tconst == directors.tconst)
+                 .select("director", "primaryTitle", "startYear", "averageRating", "numVotes"))
+    dataframe = dataframe.join(names_df, dataframe.director == names_df.nconst)
 
     window_spec_1 = Window.partitionBy("director").orderBy(f.desc("averageRating"))
     dataframe = dataframe.withColumn("row",

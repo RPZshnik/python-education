@@ -8,18 +8,18 @@ import dataframes as dfs
 
 def get_spark_session() -> SparkSession:
     """Function create and return spark session"""
-    spark = SparkSession.builder \
-        .master('local[*]') \
-        .appName('task1') \
-        .getOrCreate()
+    spark = (SparkSession.builder
+             .master('local[*]')
+             .appName('task3')
+             .getOrCreate())
     return spark
 
 
 def get_films_with_ratings(spark: SparkSession) -> DataFrame:
     """Function join films and ratings dataframes and return the result"""
     df1 = dfs.get_title_basics_df(spark, "./data/title.basics.tsv")
-    df2 = dfs.get_title_ratings_df(spark, "./data/title.ratings.tsv")\
-        .withColumnRenamed("tconst", "r_tconst")
+    df2 = (dfs.get_title_ratings_df(spark, "./data/title.ratings.tsv")
+           .withColumnRenamed("tconst", "r_tconst"))
     dataframe = df1.join(df2, df1.tconst == df2.r_tconst)
     return dataframe
 
@@ -34,7 +34,7 @@ def get_top_between(dataframe: DataFrame, start_year: int, end_year: int) -> Dat
 
 def get_top_10_for_each_genre(dataframe: DataFrame) -> DataFrame:
     """Function return top 10 for each genre dataframe"""
-    dataframe = dataframe.where(f.col("numVotes") >= 10 ** 5)
+    dataframe = dataframe.where(f.col("numVotes") >= 100_000)
     window_spec = Window.partitionBy("genre").orderBy(f.desc("averageRating"))
     dataframe = dataframe.select("tconst", "primaryTitle",
                                  "numVotes", "averageRating",
@@ -46,6 +46,7 @@ def get_top_10_for_each_genre(dataframe: DataFrame) -> DataFrame:
 
 def get_top_each_genre_in_decade(dataframe: DataFrame) -> DataFrame:
     """Function return top 10 for each genre in every decade dataframe"""
+
     def get_by_decade():
         for year in range(2020, 1949, -10):
             yield get_top_between(dataframe, year, year + 10)
@@ -54,9 +55,10 @@ def get_top_each_genre_in_decade(dataframe: DataFrame) -> DataFrame:
         return prev_element.union(element)
 
     dataframe = reduce(union, [get_top_10_for_each_genre(df) for df in get_by_decade()])
-    dataframe = dataframe.withColumn("yearRange",
-                                     f.concat_ws("-", f.floor(f.col('startYear') / 10) * 10,
-                                                 f.floor(f.col('startYear') / 10 + 1) * 10))
+    concat_expression = f.concat_ws("-", f.floor(f.col('startYear') / 10) * 10,
+                                    f.floor(f.col('startYear') / 10 + 1) * 10)
+    dataframe = dataframe.withColumn("yearRange", concat_expression)
+
     return dataframe
 
 
