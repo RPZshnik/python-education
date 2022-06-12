@@ -3,8 +3,8 @@ from pyspark.sql.types import Row
 from data_engineering.spark_practice_1.task1 import get_top_between
 
 
-def test_get_top_between(spark_session, test_title_basics_ratings):
-    test_df = test_title_basics_ratings
+def test_get_top_between(spark_session, title_basics_ratings):
+    test_df = title_basics_ratings
     test_df.show()
     expected_df = spark_session.createDataFrame([
         Row(tconst='tt0000001', titleType='movie',

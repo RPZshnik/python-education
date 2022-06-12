@@ -7,9 +7,9 @@ from data_engineering.spark_practice_1.task1 import get_films_with_ratings
 @patch('task1.dfs.get_title_ratings_df')
 @patch('task1.dfs.get_title_basics_df')
 def test_get_films_with_ratings(titles_mock, rating_mock, spark_session,
-                                test_title_basics, test_title_ratings):
-    test_titles_df = test_title_basics
-    test_ratings_df = test_title_ratings
+                                title_basics, title_ratings):
+    test_titles_df = title_basics
+    test_ratings_df = title_ratings
     expected_df = spark_session.createDataFrame([
         Row(tconst='tt0000001', titleType='short',
             primaryTitle='Carmencita', originalTitle='Carmencita',

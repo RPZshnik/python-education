@@ -20,7 +20,7 @@ def spark_session():
 
 
 @pytest.fixture()
-def test_title_basics(spark_session):
+def title_basics(spark_session):
     """Fixture of title_basic.
 
     Yields:
@@ -50,7 +50,7 @@ def test_title_basics(spark_session):
 
 
 @pytest.fixture()
-def test_title_ratings(spark_session):
+def title_ratings(spark_session):
     """Fixture of title_ratings.
 
     Yields:
@@ -68,7 +68,7 @@ def test_title_ratings(spark_session):
 
 
 @pytest.fixture()
-def test_title_basics_ratings(spark_session):
+def title_basics_ratings(spark_session):
     """Fixture of title_ratings.
 
     Yields:
