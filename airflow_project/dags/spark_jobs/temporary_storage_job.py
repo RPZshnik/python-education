@@ -1,4 +1,5 @@
 """Job code for temporary storage DAG"""
+import time
 from os import environ
 from datetime import datetime
 import json
@@ -35,11 +36,21 @@ def get_exchanger_data(api_link: str):
 
 def save_json_to_minio(**kwargs):
     """Function for save json files from services to minio"""
+    print("4" * 1000)
+    s3_connection = get_s3_connection()
+
     exchanger = kwargs['exchanger']
     api_link = kwargs['link']
-    s3_connection = get_s3_connection()
+    end_start_format = kwargs['end_start_format']
+
+    timestamp = (time.time() // 60 * 60)
+    date_time_start = datetime.utcfromtimestamp(timestamp - 60).strftime(end_start_format)
+    date_time_end = datetime.utcfromtimestamp(timestamp).strftime(end_start_format)
+    api_link = api_link.format(date_time_start, date_time_end)
+    print("4"*1000)
+    print(api_link)
     json_data = get_exchanger_data(api_link)
     if json_data is None:
-        raise ValueError("response is empty")
+        pass
     s3_connection.Bucket(exchanger).put_object(Body=json_data,
                                                Key=f'{exchanger}-{datetime.now()}.json')

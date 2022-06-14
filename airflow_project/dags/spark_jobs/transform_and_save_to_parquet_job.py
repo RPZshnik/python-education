@@ -8,8 +8,7 @@ from botocore.config import Config
 
 from pyspark.sql import functions as f
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import to_timestamp, from_unixtime, col, date_format, current_timestamp, unix_timestamp, \
-    to_date
+from pyspark.sql.functions import to_timestamp, from_unixtime, col
 
 exchangers_json_schemas = {'bitfinex': {"exchanger_name": "bitfinex",
                                         "time": {"time_field": "timestamp",
