@@ -132,8 +132,9 @@ def save_dataframe_to_parquet(dataframe: DataFrame, s3_connection, bucket: str):
     bucket_name = f"{bucket}-parquet"
     with io.BytesIO() as buffer:
         dataframe.toPandas().to_parquet(buffer, index=False)
+        date_time = datetime.now()
         s3_connection.Bucket(bucket_name).put_object(
-            Key=f'{bucket_name}-{datetime.now().strftime("%m-%d-%y_%H:%M:%S")}.parquet',
+            Key=f'{date_time.strftime("%m-%d-%y")}/{bucket_name}-{date_time.strftime("%H:%M:%S")}.parquet',
             Body=buffer.getvalue()
         )
 

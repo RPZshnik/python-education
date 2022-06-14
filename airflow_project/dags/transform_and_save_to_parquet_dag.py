@@ -16,11 +16,7 @@ default_args = {
     "is_paused_upon_creation": False
 }
 
-services = {
-    'bitfinex': 'https://api.bitfinex.com/v1/trades/btcusd?limit_trades=500',
-    'bitmex': 'https://www.bitmex.com/api/v1/trade?symbol=XBTUSD&count=500&reverse=true',
-    'poloniex': 'https://poloniex.com/public?command=returnTradeHistory&currencyPair=USDT_BTC',
-}
+services = ['bitfinex', 'bitmex', 'poloniex']
 
 
 with DAG("transform_and_save_to_parquet_dag", schedule_interval="0 * * * *",
@@ -29,7 +25,7 @@ with DAG("transform_and_save_to_parquet_dag", schedule_interval="0 * * * *",
     bucket_create_operators = []
     bucket_clear_operators = []
 
-    for exchange, link in services.items():
+    for exchange in services:
         operator = PythonOperator(
             task_id=f'create_{exchange}_parquet_bucket',
             python_callable=create_bucket,
