@@ -3,11 +3,8 @@ from datetime import timedelta
 from os import environ
 
 from airflow import DAG
-from airflow.models.dag import get_last_dagrun
 from airflow.operators.python import PythonOperator
-from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.utils.dates import datetime
-from airflow.utils.session import provide_session
 
 from jobs.save_movies_range_job import save_movies_range
 from jobs.manage_buckets import create_bucket
@@ -26,10 +23,9 @@ default_args = {
 
 
 with DAG("save_movies_dag", default_args=default_args,
-         schedule_interval="0 * * * *", catchup=False) as dag:
+         schedule_interval="* * 0 0 1", catchup=False) as dag:
 
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
-    print(bucket_name)
     bucket_create_operator = PythonOperator(
         task_id=f'create_range_bucket',
         python_callable=create_bucket,

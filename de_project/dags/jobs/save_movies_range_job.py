@@ -9,7 +9,6 @@ import requests
 from botocore.config import Config
 from requests.exceptions import RequestException
 
-# Timedelta in days
 DEFAULT_START_DATE = "1800-01-01"
 
 
@@ -86,6 +85,8 @@ def __get_data_per_day(date: datetime):
 
     def get_results(future_to_url):
         for future in concurrent.futures.as_completed(future_to_url):
+            if future.result()["imdb_id"] is None:
+                continue
             yield future.result()
             time.sleep(0.005)
 
