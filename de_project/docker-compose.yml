@@ -31,7 +31,6 @@ services:
             - "5432:5432"
         env_file:
             - .env
-
     redis:
         image: redis:6-alpine
         ports:

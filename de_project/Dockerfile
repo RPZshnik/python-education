@@ -23,6 +23,7 @@ ENV PATH="/usr/lib/jdk/openjdk-8u252-b09/bin:${PATH}"
 USER airflow
 
 RUN pip install --upgrade pip==21.1.1 \
+    && pip install -U marshmallow-sqlalchemy\
     && pip install celery \
     && pip install plyvel==1.3.0 \
     && pip install -r ${AIRFLOW_HOME}/requirements.txt

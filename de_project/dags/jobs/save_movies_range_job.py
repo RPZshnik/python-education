@@ -9,7 +9,7 @@ import requests
 from botocore.config import Config
 from requests.exceptions import RequestException
 
-DEFAULT_START_DATE = "1800-01-01"
+DEFAULT_START_DATE = "2022-03-15"
 
 
 def __get_s3_connection():
@@ -99,7 +99,7 @@ def __get_data_per_day(date: datetime):
 
 def __get_data(start_parse_date: datetime):
     """Function get and return data by api link in byte format"""
-    end_parse_date = datetime.now()
+    end_parse_date = datetime.now() - timedelta(days=1)
     time_delta = (end_parse_date - start_parse_date).days
     for days_delta in range(time_delta):
         current_date = end_parse_date - timedelta(days=days_delta)

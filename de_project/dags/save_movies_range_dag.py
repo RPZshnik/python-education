@@ -23,7 +23,7 @@ default_args = {
 
 
 with DAG("save_movies_dag", default_args=default_args,
-         schedule_interval="* * 0 0 1", catchup=False) as dag:
+         schedule_interval="@once", catchup=False) as dag:
 
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
     bucket_create_operator = PythonOperator(
