@@ -7,8 +7,8 @@ from airflow.operators.python import PythonOperator
 from airflow.utils.dates import datetime
 from jobs.load_data_to_postgres_job import load_data_to_postgres
 
-from jobs.manage_buckets import clear_bucket
-from jobs.manage_postgres import create_db
+from manage.manage_postgres import create_db
+from manage.manage_buckets import clear_bucket
 
 start_datetime = datetime(2022, 6, 11, 11, 30, 0, 0)
 
@@ -22,14 +22,15 @@ default_args = {
 
 
 with DAG("load_data_to_postgres_dag", default_args=default_args,
-         schedule_interval="0 2 * * *", catchup=False) as dag:
+         schedule_interval="40 1 * * *", catchup=False) as dag:
 
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
+    db_name = environ.get("FILMS_POSTGRES_TABLE_NAME")
 
     create_db = PythonOperator(
         task_id="create_db",
         python_callable=create_db,
-        op_kwargs={"db_name": "films"}
+        op_kwargs={"db_name": db_name}
     )
 
     save = PythonOperator(
@@ -37,10 +38,10 @@ with DAG("load_data_to_postgres_dag", default_args=default_args,
         python_callable=load_data_to_postgres,
     )
 
-    # clear_bucket = PythonOperator(
-    #     task_id="clear_films_bucket",
-    #     python_callable=clear_bucket,
-    #     op_kwargs={"bucket_name": bucket_name}
-    # )
+    clear = PythonOperator(
+        task_id="clear_films_bucket",
+        python_callable=clear_bucket,
+        op_kwargs={"bucket_name": bucket_name}
+    )
 
-    create_db >> save
+    create_db >> save >> clear

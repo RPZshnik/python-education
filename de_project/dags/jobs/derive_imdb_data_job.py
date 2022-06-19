@@ -1,11 +1,28 @@
 """Job codes for derive imdb data DAG"""
 import io
 from os import environ
+
+import boto3
 import pandas as pd
 import psycopg2
+from botocore.config import Config
 from pyspark.sql import SparkSession
 
-from manage_buckets import get_s3_connection
+
+def get_s3_connection():
+    """Function create and return s3 connection"""
+    user = environ.get('MINIO_ROOT_USER')
+    password = environ.get('MINIO_ROOT_PASSWORD')
+    session = boto3.session.Session()
+    s3_connection = session.resource(
+        's3',
+        endpoint_url='http://s3:9000',
+        aws_access_key_id=user,
+        aws_secret_access_key=password,
+        config=Config(signature_version='s3v4'),
+        region_name='us-west-1'
+    )
+    return s3_connection
 
 
 def get_spark_session() -> SparkSession:

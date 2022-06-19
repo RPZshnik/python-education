@@ -7,7 +7,7 @@ from airflow.operators.python import PythonOperator
 from airflow.utils.dates import datetime
 
 from jobs.save_movies_range_job import save_movies_range
-from jobs.manage_buckets import create_bucket
+from manage.manage_buckets import create_bucket
 
 
 start_datetime = datetime(2022, 6, 11, 11, 30, 0, 0)

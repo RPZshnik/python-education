@@ -4,10 +4,27 @@ import time
 from os import environ
 from datetime import datetime, timedelta
 import json
+
+import boto3
 import requests
+from botocore.config import Config
 from requests.exceptions import RequestException
 
-from manage_buckets import get_s3_connection
+
+def get_s3_connection():
+    """Function create and return s3 connection"""
+    user = environ.get('MINIO_ROOT_USER')
+    password = environ.get('MINIO_ROOT_PASSWORD')
+    session = boto3.session.Session()
+    s3_connection = session.resource(
+        's3',
+        endpoint_url='http://s3:9000',
+        aws_access_key_id=user,
+        aws_secret_access_key=password,
+        config=Config(signature_version='s3v4'),
+        region_name='us-west-1'
+    )
+    return s3_connection
 
 
 def __get_api_link(start_parse_date: datetime, end_parse_date: datetime):
@@ -83,4 +100,5 @@ def update_movies():
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
     today_date = datetime.now() - timedelta(days=1)
     data = __get_data_per_day(today_date)
+    print(data)
     __save_to_minio(s3_connection, bucket_name, data, today_date)
