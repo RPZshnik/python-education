@@ -27,13 +27,13 @@ with DAG("save_movies_dag", default_args=default_args,
 
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
     bucket_create_operator = PythonOperator(
-        task_id=f'create_range_bucket',
+        task_id='create_range_bucket',
         python_callable=create_bucket,
         op_kwargs={'bucket_name': bucket_name}
     )
 
     save_operator = PythonOperator(
-        task_id=f'save_movies_range_to_minio',
+        task_id='save_movies_range_to_minio',
         python_callable=save_movies_range,
         provide_context=True
     )

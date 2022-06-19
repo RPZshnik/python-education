@@ -1,6 +1,5 @@
 """DAG that derive imdb data"""
 from datetime import timedelta
-from os import environ
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -23,6 +22,6 @@ with DAG("derive_imdb_data_dag", default_args=default_args,
          schedule_interval="0 3 * * *", catchup=False) as dag:
 
     derive_data = PythonOperator(
-        task_id=f'derive_imdb_data',
+        task_id='derive_imdb_data',
         python_callable=derive_imdb_data,
     )

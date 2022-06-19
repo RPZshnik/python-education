@@ -33,12 +33,12 @@ with DAG("load_data_to_postgres_dag", default_args=default_args,
     )
 
     save = PythonOperator(
-        task_id=f'load_data_to_postgres',
+        task_id='load_data_to_postgres',
         python_callable=load_data_to_postgres,
     )
 
     # clear_bucket = PythonOperator(
-    #     task_id=f"clear_films_bucket",
+    #     task_id="clear_films_bucket",
     #     python_callable=clear_bucket,
     #     op_kwargs={"bucket_name": bucket_name}
     # )

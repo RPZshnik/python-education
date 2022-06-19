@@ -5,29 +5,12 @@ import time
 from os import environ
 from datetime import datetime, timedelta
 import json
-import boto3
 import requests
-from botocore.config import Config
 from requests.exceptions import RequestException
 
+from manage_buckets import get_s3_connection
+
 DEFAULT_START_DATE = "2020-01-01"
-
-
-def __get_s3_connection():
-    """Function create and return s3 connection"""
-    user = environ.get('MINIO_ROOT_USER')
-    password = environ.get('MINIO_ROOT_PASSWORD')
-
-    session = boto3.session.Session()
-    s3_connection = session.resource(
-        's3',
-        endpoint_url='http://s3:9000',
-        aws_access_key_id=user,
-        aws_secret_access_key=password,
-        config=Config(signature_version='s3v4'),
-        region_name='us-west-1'
-    )
-    return s3_connection
 
 
 def __get_start_parse_date(**context) -> datetime:
@@ -77,7 +60,8 @@ def __get_data_per_day(date: datetime):
     api_key = environ.get('TMDB_API_KEY')
     link = "https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}"
     session = requests.session()
-    api_links = [link.format(movie_id=movie_id, api_key=api_key) for movie_id in __get_id_of_movies_per_day(date)]
+    api_links = [link.format(movie_id=movie_id, api_key=api_key)
+                 for movie_id in __get_id_of_movies_per_day(date)]
 
     def load_url(url):
         response = session.get(url, headers={'Accept-Encoding': 'identity'})
@@ -120,7 +104,7 @@ def __save_to_minio(connection, bucket_name, data):
 
 def save_movies_range(**context):
     """Function that implement parse and save data to minio"""
-    s3_connection = __get_s3_connection()
+    s3_connection = get_s3_connection()
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
     start_parse_date = __get_start_parse_date(**context)
     json_data_with_date = __get_data(start_parse_date)
