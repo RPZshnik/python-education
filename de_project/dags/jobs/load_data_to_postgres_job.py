@@ -120,6 +120,7 @@ def __transform_dataframe(dataframe: DataFrame) -> DataFrame:
 def __save_dataframe_to_db(db_connection, dataframe: DataFrame):
     dataframe.toPandas().to_sql('films', db_connection,
                                 index=False, if_exists='append')
+    del dataframe
 
 
 def load_data_to_postgres():
@@ -129,7 +130,7 @@ def load_data_to_postgres():
     spark = get_spark_session()
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
     data_files = __get_data_files(s3_connection, bucket_name)
-    for index in range(0, len(data_files), 1000):
-        dataframe = __get_dataframe_from_data_files(spark, data_files[index:index+1000])
+    for index in range(0, len(data_files), 100):
+        dataframe = __get_dataframe_from_data_files(spark, data_files[index:index+100])
         dataframe = __transform_dataframe(dataframe)
         __save_dataframe_to_db(db_connection, dataframe)
