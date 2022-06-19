@@ -9,7 +9,7 @@ from airflow.utils.dates import datetime
 from jobs.update_movies_job import update_movies
 
 
-start_datetime = datetime(2022, 6, 11, 11, 30, 0, 0)
+start_datetime = datetime(2022, 6, 20, 0, 0, 0, 0)
 
 default_args = {
     "owner": "airflow",
@@ -21,7 +21,7 @@ default_args = {
 
 
 with DAG("update_movies_dag", default_args=default_args,
-         schedule_interval="35 1 * * *", catchup=False) as dag:
+         schedule_interval="0 0 * * *", catchup=False) as dag:
 
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
 

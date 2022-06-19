@@ -8,7 +8,7 @@ from airflow.utils.dates import datetime
 
 from jobs.derive_imdb_data_job import derive_imdb_data
 
-start_datetime = datetime(2022, 6, 11, 11, 30, 0, 0)
+start_datetime = datetime(2022, 6, 20, 0, 0, 0, 0)
 
 default_args = {
     "owner": "airflow",

@@ -10,7 +10,7 @@ from jobs.save_movies_range_job import save_movies_range
 from manage.manage_buckets import create_bucket
 
 
-start_datetime = datetime(2022, 6, 11, 11, 30, 0, 0)
+start_datetime = datetime(2022, 6, 20, 0, 0, 0, 0)
 
 default_args = {
     "owner": "airflow",

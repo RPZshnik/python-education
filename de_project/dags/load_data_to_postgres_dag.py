@@ -10,7 +10,7 @@ from jobs.load_data_to_postgres_job import load_data_to_postgres
 from manage.manage_postgres import create_db
 from manage.manage_buckets import clear_bucket
 
-start_datetime = datetime(2022, 6, 11, 11, 30, 0, 0)
+start_datetime = datetime(2022, 6, 20, 0, 0, 0, 0)
 
 default_args = {
     "owner": "airflow",
@@ -22,7 +22,7 @@ default_args = {
 
 
 with DAG("load_data_to_postgres_dag", default_args=default_args,
-         schedule_interval="40 1 * * *", catchup=False) as dag:
+         schedule_interval="0 1 * * *", catchup=False) as dag:
 
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
     db_name = environ.get("FILMS_POSTGRES_TABLE_NAME")
