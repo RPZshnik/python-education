@@ -1,15 +1,17 @@
 import logging
 from os import environ
-
+import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy_utils import database_exists
 
 
-def get_db_connection():
+def get_db_connection(db_name=None):
     db_user = environ.get("POSTGRES_USER")
     db_port = environ.get("POSTGRES_PORT")
     db_password = environ.get('POSTGRES_PASSWORD')
-    db_connection = create_engine(f'postgresql+psycopg2://{db_user}:{db_password}@database:{db_port}')
+    if db_name is None:
+        db_connection = create_engine(f'postgresql+psycopg2://{db_user}:{db_password}@database:{db_port}')
+    else:
+        db_connection = create_engine(f'postgresql+psycopg2://{db_user}:{db_password}@database:{db_port}/{db_name}')
     return db_connection
 
 
@@ -21,3 +23,10 @@ def create_db(db_name: str):
         logging.warning(error)
     finally:
         db_connection.close()
+
+
+def load_table_from_postgres(table_name: str, db_name=None):
+    db_connection = get_db_connection(db_name).connect()
+    dataframe = pd.read_sql(f"SELECT * FROM \"{table_name}\"", db_connection)
+    db_connection.close()
+    return dataframe

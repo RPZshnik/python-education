@@ -37,10 +37,10 @@ with DAG("load_data_to_postgres_dag", default_args=default_args,
         python_callable=load_data_to_postgres,
     )
 
-    clear_bucket = PythonOperator(
-        task_id=f"clear_films_bucket",
-        python_callable=clear_bucket,
-        op_kwargs={"bucket_name": bucket_name}
-    )
+    # clear_bucket = PythonOperator(
+    #     task_id=f"clear_films_bucket",
+    #     python_callable=clear_bucket,
+    #     op_kwargs={"bucket_name": bucket_name}
+    # )
 
-    create_db >> save >> clear_bucket
+    create_db >> save

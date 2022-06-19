@@ -1,4 +1,4 @@
-"""Job codes for update movies DAG"""
+"""Job codes for load data to postgres DAG"""
 import concurrent.futures
 import time
 from os import environ
@@ -9,6 +9,7 @@ import requests
 from botocore.config import Config
 from pyspark.shell import sc
 from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql.functions import posexplode, col, lit
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, BooleanType, LongType, DoubleType, \
     ArrayType
 from requests.exceptions import RequestException
@@ -64,7 +65,11 @@ def __get_s3_connection():
 def get_spark_session() -> SparkSession:
     """Function create and return spark session"""
     spark = (SparkSession.builder
-             .master('local[*]')
+             .master('local[4]')
+             .config("spark.executor.memory", "70g")
+             .config("spark.driver.memory", "50g")
+             .config("spark.memory.offHeap.enabled", True)
+             .config("spark.memory.offHeap.size", "16g")
              .appName('task1')
              .getOrCreate())
     return spark
@@ -99,10 +104,16 @@ def __get_dataframe_from_data_files(spark, data_files):
     return dataframe
 
 
-def __transform_dataframe(dataframe):
+def __transform_dataframe(dataframe: DataFrame) -> DataFrame:
+    dataframe = (dataframe.select("id", "imdb_id", "adult", "original_language",
+                                  "original_title", "popularity", "release_date",
+                                  "runtime", "status", posexplode("genres").
+                                  alias("pos", "genre")).where(col("pos") < 1))
     dataframe = dataframe.select("id", "imdb_id", "adult", "original_language",
                                  "original_title", "popularity", "release_date",
-                                 "runtime", "status")
+                                 "runtime", "status", col("genre.name").alias("genre"))
+    dataframe = dataframe.withColumn("average_rating",
+                                     lit(None).cast(DoubleType())).withColumn("num_votes", lit(None).cast(IntegerType()))
     return dataframe
 
 
@@ -114,12 +125,11 @@ def __save_dataframe_to_db(db_connection, dataframe: DataFrame):
 def load_data_to_postgres():
     """Function that implement parse and save data to minio"""
     s3_connection = __get_s3_connection()
+    db_connection = get_db_connection()
     spark = get_spark_session()
     bucket_name = environ.get("MINIO_RAW_DATA_BUCKET_NAME")
     data_files = __get_data_files(s3_connection, bucket_name)
-    dataframe = __get_dataframe_from_data_files(spark, data_files)
-    if dataframe is None:
-        return
-    dataframe = __transform_dataframe(dataframe)
-    db_connection = get_db_connection()
-    __save_dataframe_to_db(db_connection, dataframe)
+    for index in range(0, len(data_files), 1000):
+        dataframe = __get_dataframe_from_data_files(spark, data_files[index:index+1000])
+        dataframe = __transform_dataframe(dataframe)
+        __save_dataframe_to_db(db_connection, dataframe)

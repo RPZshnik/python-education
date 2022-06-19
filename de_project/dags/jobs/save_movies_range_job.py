@@ -1,5 +1,6 @@
 """Job codes for save movies range DAG"""
 import concurrent.futures
+import logging
 import time
 from os import environ
 from datetime import datetime, timedelta
@@ -9,7 +10,7 @@ import requests
 from botocore.config import Config
 from requests.exceptions import RequestException
 
-DEFAULT_START_DATE = "2022-03-15"
+DEFAULT_START_DATE = "2020-01-01"
 
 
 def __get_s3_connection():
@@ -33,7 +34,6 @@ def __get_start_parse_date(**context) -> datetime:
     try:
         start_parse_date = context['dag_run'].conf['start_parse_date']
         start_parse_date = datetime.strptime(start_parse_date, "%Y-%m-%d")
-        print(start_parse_date)
     except KeyError:
         start_parse_date = datetime.strptime(DEFAULT_START_DATE, "%Y-%m-%d")
     return start_parse_date
@@ -80,7 +80,7 @@ def __get_data_per_day(date: datetime):
     api_links = [link.format(movie_id=movie_id, api_key=api_key) for movie_id in __get_id_of_movies_per_day(date)]
 
     def load_url(url):
-        response = session.get(url)
+        response = session.get(url, headers={'Accept-Encoding': 'identity'})
         return response.json()
 
     def get_results(future_to_url):
@@ -103,8 +103,11 @@ def __get_data(start_parse_date: datetime):
     time_delta = (end_parse_date - start_parse_date).days
     for days_delta in range(time_delta):
         current_date = end_parse_date - timedelta(days=days_delta)
-        data_per_day = __get_data_per_day(current_date)
-        yield data_per_day, current_date
+        try:
+            data_per_day = __get_data_per_day(current_date)
+            yield data_per_day, current_date
+        except Exception as error:
+            logging.error(error)
 
 
 def __save_to_minio(connection, bucket_name, data):
