@@ -16,8 +16,6 @@ Getting Started
 
 Set up credentials (in e.g. ~/.env/):
 
-.. code-block:: ini
-
     MINIO_ROOT_USER=YOUR_MINIO_ACCESS_KEY
     MINIO_ROOT_PASSWORD=YOUR_MINIO_SECRET_KEY
     MINIO_RAW_DATA_BUCKET_NAME=YOUR_MINIO_RAW_DATA_BUCKET_NAME
@@ -45,8 +43,6 @@ Set up credentials (in e.g. ~/.env/):
     MB_DB_HOST=YOUR_MB_DB_HOST
 
 Then, assuming that you have a supported version of docker-compose installed, you can start the project with:
-
-.. code-block:: sh
 
     $ sudo docker-compose up
 
