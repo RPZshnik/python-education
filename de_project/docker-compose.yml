@@ -47,6 +47,20 @@ services:
             - .env
         command: minio server --console-address :9001 /data
 
+    metabase:
+        image: metabase/metabase
+        restart: always
+        ports:
+            - "3001:3000"
+        volumes:
+            - ./metabase-data:/metabase-data
+        env_file:
+            -  .env
+        depends_on:
+            - database
+        links:
+            - database
+
 volumes:
     dags:
     storage:

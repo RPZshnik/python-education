@@ -9,7 +9,7 @@ from airflow.utils.dates import datetime
 from jobs.update_movies_job import update_movies
 
 
-start_datetime = datetime(2022, 6, 20, 0, 0, 0, 0)
+start_datetime = datetime(2021, 6, 20, 0, 0, 0, 0)
 
 default_args = {
     "owner": "airflow",

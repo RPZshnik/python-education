@@ -10,7 +10,7 @@ from jobs.load_data_to_postgres_job import load_data_to_postgres
 from manage.manage_postgres import create_db
 from manage.manage_buckets import clear_bucket
 
-start_datetime = datetime(2022, 6, 20, 0, 0, 0, 0)
+start_datetime = datetime(2021, 6, 20, 0, 0, 0, 0)
 
 default_args = {
     "owner": "airflow",
