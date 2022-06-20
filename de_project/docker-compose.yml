@@ -1,0 +1,66 @@
+version: "3.3"
+services:
+    airflow-master:
+        build:
+            context: .
+        ports:
+            - "8000:8000"
+            - "5555:5555"
+        env_file:
+            - .env
+        volumes:
+            - ./dags:/home/airflow/dags
+        depends_on:
+            - database
+            - redis
+
+    airflow-worker:
+        build:
+            context: .
+        entrypoint: airflow celery worker
+        env_file:
+            - .env
+        volumes:
+            - ./dags:/home/airflow/dags
+        depends_on:
+            - airflow-master
+
+    database:
+        image: postgres:10
+        ports:
+            - "5432:5432"
+        env_file:
+            - .env
+    redis:
+        image: redis:6-alpine
+        ports:
+            - "6379:6379"
+
+    s3:
+        image: minio/minio
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        volumes:
+            - ./storage:/data
+        env_file:
+            - .env
+        command: minio server --console-address :9001 /data
+
+    metabase:
+        image: metabase/metabase
+        restart: always
+        ports:
+            - "3001:3000"
+        volumes:
+            - ./metabase-data:/metabase-data
+        env_file:
+            -  .env
+        depends_on:
+            - database
+        links:
+            - database
+
+volumes:
+    dags:
+    storage:
